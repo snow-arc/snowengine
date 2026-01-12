@@ -29,7 +29,7 @@ A beautiful video wallpaper manager for Hyprland/Wayland.
 
 ### Settings
 - 👤 Custom username
-- 🖼️ Custom avatar image
+- 🖼️ Custom avatar image (ok i remove this, no need for it, i forget about that)
 - 💾 Persistent configuration
 
 ## 📋 Requirements
