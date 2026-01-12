@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+
+import sys
+import json
+import argparse
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from src.core.config import ConfigManager
+from src.core.mpvpaper import MPVPaperManager
+
+
+def main():
+    config = ConfigManager()
+    mpv = MPVPaperManager(config)
+    
+    parser = argparse.ArgumentParser(description='W-Engine CLI')
+    subparsers = parser.add_subparsers(dest='command')
+    
+    status_parser = subparsers.add_parser('status', help='Show status')
+    
+    local_parser = subparsers.add_parser('play-local', help='Play local video')
+    local_parser.add_argument('path', help='Video path')
+    local_parser.add_argument('--volume', type=int, default=50, help='Volume 0-100')
+    local_parser.add_argument('--scale', choices=['fill', 'fit', 'stretch', 'center'], default='fill', help='Scale mode')
+    local_parser.add_argument('--no-loop', action='store_true', help='Disable loop')
+    
+    yt_parser = subparsers.add_parser('play-youtube', help='Play YouTube video')
+    yt_parser.add_argument('url', help='YouTube URL')
+    yt_parser.add_argument('--volume', type=int, default=50, help='Volume 0-100')
+    yt_parser.add_argument('--scale', choices=['fill', 'fit', 'stretch', 'center'], default='fill', help='Scale mode')
+    yt_parser.add_argument('--no-loop', action='store_true', help='Disable loop')
+    
+    stop_parser = subparsers.add_parser('stop', help='Stop wallpaper')
+    toggle_parser = subparsers.add_parser('toggle', help='Toggle on/off')
+    
+    args = parser.parse_args()
+    
+    if args.command == 'status':
+        status = mpv.get_status()
+        print(json.dumps(status, indent=2))
+    
+    elif args.command == 'play-local':
+        loop = not args.no_loop
+        success, msg = mpv.play(args.path, volume=args.volume, loop=loop, scale_mode=args.scale)
+        if success:
+            config.save_state(args.path, 'local')
+        print(msg)
+    
+    elif args.command == 'play-youtube':
+        loop = not args.no_loop
+        success, msg = mpv.play_youtube(args.url, volume=args.volume, loop=loop, scale_mode=args.scale)
+        if success:
+            config.save_state(args.url, 'youtube')
+        print(msg)
+    
+    elif args.command == 'stop':
+        success = mpv.stop()
+        print("Stopped" if success else "Failed")
+    
+    elif args.command == 'toggle':
+        success = mpv.toggle()
+        print("Toggled" if success else "Failed")
+    
+    else:
+        parser.print_help()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
