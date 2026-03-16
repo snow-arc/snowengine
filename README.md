@@ -55,7 +55,7 @@ A beautiful video wallpaper manager for Hyprland/Wayland.
 sudo pacman -S mpvpaper mpv python python-gobject gtk4 libadwaita ffmpeg yt-dlp
 
 # Clone and install
-git clone https://github.com/snow/snow-engine.git
+git clone https://github.com/snow-arc/snow-engine.git
 cd snow-engine
 ./install.sh
 ```
